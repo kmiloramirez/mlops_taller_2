@@ -1,101 +1,97 @@
 # Taller 2 - MLOps (UNIVERSIDAD EIA)
 
+- Santiago Fernandez
+- Juan Camilo Ramirez
+- Sofía Restrepo
+
 Este repositorio contiene el desarrollo del Taller 2 de la materia MLOps. Se aplica la metodología CRISP-DM utilizando el siguiente dataset: **[Data Science Salaries 2023](https://www.kaggle.com/datasets/arnabchaki/data-science-salaries-2023)**
 
 1. **Entendimiento de Negocio**
 
    - **Objetivo de Negocio:**
-     Evaluar factores que afectan los salarios en roles relacionados con ciencia de datos y proporcionar insights que puedan guiar decisiones estratégicas para empleadores y empleados.
+     Evaluar factores que afectan los salarios en roles relacionados con ciencia de datos y predecir el valor estimado del salario según las carácteristicas del empleado.
    - **Objetivo Analítico:**
-     Predecir el salario esperado en función de características como experiencia, región, rol y habilidades técnicas.
+     Predecir el salario esperado en función de características como experiencia, región del empleado y de la empresa y rol a través de diferentes modelos de Machine Learning.
 
 2. **Entendimiento de los Datos**
 
-   - Exploración inicial del dataset.
-   - Análisis univariado, bivariado y generación de visualizaciones para identificar patrones y relaciones.
+   - Se realizó un análisis exploratorio de los datos en el archivo **EDA.ipynb** para entender los datos y determinar las transformaciones necesarias.
 
 3. **Preparación de Datos**
+   El dataset no incluía ningun dato nulo, por lo que no fue necesario realizar una imputación.
 
-   - Transformaciones realizadas para variables de entrada y salida.
-   - Proceso detallado de limpieza y tratamiento de datos faltantes o atípicos.
+   El manejo de datos atípicos se hizo a través de la creación de un umbral con el percentil 90. Solo se mantuvieron los datos de salario cuyo valor sea inferior al valor al que pertenecen el 90% de los datos. Esto permite reducir los sesgos debido a valores atípicos.
+
+   A través del análisis exploratorio, se optó por utilizar los datos de las 5 regiones de empresa con la mayor cantidad de registros, además de los trabajos que cuenten con un tipo de contratación a tiempo completo. Se filtró tambien el dataset para incluir unicamente los registros de los años 2022 y 2023, ya que la cantidad de datos era mayor y estos eran más actualizados respecto al año actual. Se eliminó las columnas 'work_year' y 'employment_type' ya que los datos fueron filtrados previamente.
+
+   Adicionalmente, las columnas 'salary' y 'salary_currency' tambien fueron eliminadas, ya que solo se realizarán predicciones sobre el salario en dolares (USD).
+
+   Se realizó una codificación One Hot para todas las columnas categoricas, y se utilizó un LabelEncoder para codificar la columna 'job_title' obteniendo un valor númerico para cada una de las posibles posiciones de trabajo.
+
+   **Transformaciones frecuentemente utilizadas en la etapa de preparación de datos:**
+
+   - **Escalar los datos:** Permite tener una escala homogenea para que el modelo no dé más peso a ciertas variables unicamente por la diferencia de escala. Uno de los métodos que se utiliza es el Standard Scaling. En nuestro caso, este no fue necesario ya que la única variable númerica además del salario era el año de trabajo, y esta fue eliminada después de la exploración de los datos.
+   - **Codificación:** Se utiliza para convertir variables categóricas en variables númericas o binarias, esto permite que los modelos interpreten los datos; Tanto el One Hot Encoding como el Label Encoding fueron utilizados para nuestro proyecto.
+   - **PCA:** Reduce la dimensionalidad de los datos según las caracteristicas con mayor importancia. Esto permite reducir la dimensión de los datos manteniendo el contexto.
+   - **Manejo de datos nulos:** Rellena los valores vacios con diferentes posibilidades, ya sea con medidas de tendencia central como la media o la mediana o con métodos mas avanzados según el caso. Esto no fue necesario en nuestro proyecto ya que el dataset no contenía datos nulos.
+   - **Manejo de valores atípicos:** Limita los valores extremos para que no afecten demasiado al modelo y no tengan un peso mayor que los demás datos.
 
 4. **Modelación**
+   Se realizó una busqueda de hiperparámetros para optimizar cada modelo desarrollado en el proyecto, y se utilizó la herramienta PyCaret para determinar el modelo más apropiado para este caso de estudio.
+   Los modelos utilizados fueron:
 
-   - Implementación de al menos 5 modelos de Machine Learning, incluyendo un método de ensamble.
-   - Búsqueda de hiperparámetros para optimizar cada modelo.
-   - Se incluye el uso recomendado de la librería PyCaret para la comparación de modelos.
+   - Regresión Lineal
+   - Árbol de Decisión
+   - KNN
+   - Random Forest
+   - AdaBoost
+   - Gradient Boosting
 
 5. **Evaluación**
+   Para nuestro caso de estudio, la métrica más relevante es el **Mean Average Error (MAE)**.
 
-   - Selección de la métrica de evaluación más relevante (ej. RMSE, MAE, R²) y justificación.
-   - Identificación del mejor modelo y análisis de su aplicabilidad práctica.
+   Dado que los datos provienen de diferentes ubicaciones geograficas, el modelo se puede ver afectado a causa de la diferencia salarial entre un país y otro, además del cambio de moneda. El MAE permite tener una medida más balanceada a pesar de los posibles sesgos en la distribución del salario.
+
+   Aunque los valores atipícos fueron tratados previamente en la transformación de los datos, el MAE no es muy sensible a estos y trata todos los errores por igual lo cual puede ser una ventaja para evaluar el desempeño general del modelo sin dar un peso desproporcionado a errores grandes.
+
+   Además, si este modelo llegase a ser utilizado en una organización, el MAE permitiría una interpretación directa en dolares, permitiendo tener mas claridad en los errores del modelo respecto al salario real.
+
+   El modelo que mejor se ajusta a nuestros datos es el **GradientBoostingRegressor** optimizado a través de la busqueda de hiperparametros con GridSearchCV.
+
+   Este modelo obtuvo las siguientes métricas, haciendo enfásis en el MAE, la métrica de evaluación de mayor importancia para nuestro estudio:
+
+   - Gradient Boosting MAE: 28699.119485597774
+   - Gradient Boosting RMSE: 35798.404504122234
+   - Gradient Boosting R2 Score: 0.38188008439877064
+
+   Un modelo que permita predecir el salario de un empleado según sus carácteristicas es una herramienta muy útil para una organización. A través de las métricas de evaluación de nuestro modelo, podemos notar que para ser utilizado en producción requeriría modificaciones adicionales que permitan reducir el error, pues esta cifra es alta especialmente en casos con salarios relativamente bajos que no presenten un margen de error tan grande. Además, el R2 de nuestro modelo no es muy alto, lo que significa que hay un bajo porcentaje de los datos que están siendo explicados por las variables independientes incluidas en el modelo.
 
 6. **Despliegue**
-   - Creación de un pipeline para el mejor modelo utilizando **FastAPI**.
-   - Despliegue del endpoint en una instancia de **AWS EC2** con una URL pública para realizar predicciones.
 
----
+   El archivo **pipeline.ipynb** incluye el desarrollo del pipeline con el modelo Gradient Boosting.
 
-## Requisitos
+   El endpoint desplegado está disponible en la URL pública generada por la instancia EC2.
 
-- **Python 3.9+**
-- Librerías principales: `pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`, `PyCaret`, `FastAPI`, `uvicorn`, `boto3`.
-- Configuración de una cuenta de **AWS** para la instancia EC2.
+   **Método:** `POST`  
+   **Endpoint:** `http://<ec2-public-url>/predict`  
+   **Body (JSON):**
 
----
+   ```json
+   {
+     "experience_level": "SE",
+     "job_title": "Data Scientist",
+     "region": "US",
+     "skills": ["Python", "SQL", "Machine Learning"],
+     "remote_ratio": 100
+   }
+   ```
 
-## Ejecución del Proyecto
+   **Respuesta (JSON):**
 
-1. **Exploración y Análisis de Datos**
+   ```json
+   {
+     "predicted_salary": 125000
+   }
+   ```
 
-   - Código: `notebooks/exploration_and_analysis.ipynb`
-   - Descripción: Análisis exploratorio y gráficos.
-
-2. **Modelación**
-
-   - Código: `models/model_training.py`
-   - Descripción: Entrenamiento de modelos y búsqueda de hiperparámetros.
-
-3. **API**
-
-   - Código: `api/app.py`
-   - Descripción: FastAPI para predicción del modelo.
-
-4. **Despliegue**
-   - Detalles: Guía paso a paso en `deployment/deployment_guide.md`.
-
----
-
-## Uso del Endpoint
-
-El endpoint desplegado está disponible en la URL pública generada por la instancia EC2. Ejemplo de petición:
-
-**Método:** `POST`  
-**Endpoint:** `http://<ec2-public-url>/predict`  
-**Body (JSON):**
-
-```json
-{
-  "experience_level": "SE",
-  "job_title": "Data Scientist",
-  "region": "US",
-  "skills": ["Python", "SQL", "Machine Learning"],
-  "remote_ratio": 100
-}
-```
-
-**Respuesta (JSON):**
-
-```json
-{
-  "predicted_salary": 125000
-}
-```
-
----
-
-## Autor
-
-- Nombre: [Tu Nombre]
-- Universidad: Universidad EIA
-- Año: 2024
+   ***
