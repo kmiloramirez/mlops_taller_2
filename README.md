@@ -1,10 +1,10 @@
-# Taller 2 - MLOps (UNIVERSIDAD EIA)
+# Taller 2 - MLOps
 
 - Santiago Fernandez
 - Juan Camilo Ramirez
 - Sofía Restrepo
 
-Este repositorio contiene el desarrollo del Taller 2 de la materia MLOps. Se aplica la metodología CRISP-DM utilizando el siguiente dataset: **[Data Science Salaries 2023](https://www.kaggle.com/datasets/arnabchaki/data-science-salaries-2023)**
+Este repositorio contiene el desarrollo del Taller 2 de la materia MLOps con la metodología CRISP-DM utilizando el siguiente dataset: **[Data Science Salaries 2023](https://www.kaggle.com/datasets/arnabchaki/data-science-salaries-2023)**
 
 1. **Entendimiento de Negocio**
 
@@ -70,28 +70,6 @@ Este repositorio contiene el desarrollo del Taller 2 de la materia MLOps. Se apl
 
    El archivo **pipeline.ipynb** incluye el desarrollo del pipeline con el modelo Gradient Boosting.
 
-   El endpoint desplegado está disponible en la URL pública generada por la instancia EC2.
+   El endpoint desplegado está disponible en la URL pública generada por la instancia EC2. Para esto, se debe correr la API de FastAPI en la instancia, acceder a los grupos de seguridad y agregar una regla con el puerto donde se correrá la API. A través de los detalles de la instancia en AWS se consulta la dirección IPv4 pública que puede ser compartida y consultada para acceder al endpoint de predicción de salario mientras la instancia este activa y en ejecución. Las capturas de pantalla de la API corriendo en la instancia de EC2 se adjuntaron en la carpeta **'multimedia'** de este repositorio.
 
-   **Método:** `POST`  
-   **Endpoint:** `http://<ec2-public-url>/predict`  
-   **Body (JSON):**
-
-   ```json
-   {
-     "experience_level": "SE",
-     "job_title": "Data Scientist",
-     "region": "US",
-     "skills": ["Python", "SQL", "Machine Learning"],
-     "remote_ratio": 100
-   }
-   ```
-
-   **Respuesta (JSON):**
-
-   ```json
-   {
-     "predicted_salary": 125000
-   }
-   ```
-
-   ***
+   PD. Se agregó el diccionario de mapeo a la documentación del endpoint en FastAPI debido a las limitaciones para ejecutar el LabelEncoder en el pipeline. Por lo tanto, aunque no es optimo, se guardó el nuevo dataset con la codificación realizada en el EDA y se trató en el pipeline con los datos codificados.

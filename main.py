@@ -5,10 +5,6 @@ from fastapi import FastAPI, HTTPException
 
 model = load("pipeline.joblib")
 
-# with open('pipeline_new.pkl', 'rb') as f:
-#     model = pickle.load(f)
-
-
 app = FastAPI()
 
 class DataPredict(BaseModel):
@@ -50,14 +46,7 @@ def predict(request: DataPredict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/sum")
-def sum(param1: float, param2: float):
-    try:
-        result = param1 + param2
-        return {"param1": param1, "param2": param2, "sum": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")
 def home():
-    return {'Universidad EIA': 'MLOps'}
+    return {'Taller2 - MLOps': 'Santiago, Juan Camilo, Sofía'}
