@@ -2,9 +2,8 @@ from pandas import DataFrame
 from joblib import load
 from pydantic import BaseModel, ValidationError
 from fastapi import FastAPI, HTTPException
-import pickle
 
-# model = load("pipeline.joblib")
+model = load("pipeline.joblib")
 
 # with open('pipeline_new.pkl', 'rb') as f:
 #     model = pickle.load(f)
